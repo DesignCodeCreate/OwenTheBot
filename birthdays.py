@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands, tasks
 from dislash import slash_command, Option, OptionType
 from datetime import datetime
@@ -13,7 +14,10 @@ class Birthdays(commands.Cog):
 				bd = datetime.fromisoformat(row[0])
 				if (bd.day == now.day) and (bd.month == now.month):
 					user = await self.bot.fetch_user(row[1])
-					print("It is " + user.name + "'s birthday!")
+					embed = discord.Embed()
+					embed.color = discord.colour.orange()
+					embed.add_field(name = "Happy birthday!", value = "It's " + user.name + "'s birthday! 🥳")
+					await self.bot.get_channel(row[2]).send(embed = embed)
 	
 	def __init__(self, bot):
 		self.bot = bot
@@ -27,5 +31,5 @@ class Birthdays(commands.Cog):
 	async def inputbirthday(self, ctx, date):
 		async with aiofiles.open(self.filepath, "w") as f:
 			writer = AsyncWriter(f)
-			await writer.writerow([ctx.author.id, date])
+			await writer.writerow([ctx.author.id, date, ctx.channel.id])
 		await ctx.send("Successfully added your birthday " + date + " to the list!")
