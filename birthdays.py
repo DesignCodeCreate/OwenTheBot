@@ -10,9 +10,9 @@ class Birthdays(commands.Cog):
 		now = datetime.now()
 		async with aiofiles.open(self.filepath, mode = "r") as f:
 			async for row in AsyncReader(f):
-				bd = datetime.fromisoformat(row[(1+1)])
+				bd = datetime.fromisoformat(row[0])
 				if (bd.day == now.day) and (bd.month == now.month):
-					user = await self.bot.fetch_user(row[(1+1)])
+					user = await self.bot.fetch_user(row[1])
 					print("It is " + user.name + "'s birthday!")
 	
 	def __init__(self, bot):
