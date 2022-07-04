@@ -19,22 +19,11 @@ else:
 from fun import Fun
 from info import Info
 from help import Help
+from birthdays import Birthdays
 bot.add_cog(Fun(bot))
 bot.add_cog(Info(bot))
 bot.add_cog(Help(bot))
-
-@client.event
-async def on_message(message):
-	if message.author == bot.user: return
-	if not bot.user.mentioned_in(message): return
-	
-	if ("hello" in message.content.lower() or
-		"hi" in message.content.lower() or
-		"yo" in message.content.lower()):
-		await message.reply(random.choice(hello_answers))
-	if ("you're cool" in message.content.lower() or
-		"smart" in message.content.lower()):
-		await message.reply('Thanks! I appreciate the feedback')
+bot.add_cog(Birthdays(bot))
 
 @bot.event
 async def on_ready():
