@@ -4,3 +4,4 @@ poetry.lock
 replit.nix
 __pycache__/
 birthdays.csv
+.breakpoints
