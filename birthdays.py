@@ -11,25 +11,26 @@ class Birthdays(commands.Cog):
 		now = datetime.now()
 		async with aiofiles.open(self.filepath, mode = "r") as f:
 			async for row in AsyncReader(f):
-				bd = datetime.fromisoformat(row[0])
+				bd = datetime.fromisoformat(row[1])
 				if (bd.day == now.day) and (bd.month == now.month):
-					user = await self.bot.fetch_user(row[1])
+					user = await self.bot.fetch_user(row[0])
 					embed = discord.Embed()
-					embed.color = discord.colour.orange()
+					embed.color = discord.Colour.orange()
 					embed.add_field(name = "Happy birthday!", value = "It's " + user.name + "'s birthday! 🥳")
-					await self.bot.get_channel(row[2]).send(embed = embed)
+
+					channel = await self.bot.fetch_channel(row[2])
+					await channel.send(embed = embed)
 	
 	def __init__(self, bot):
 		self.bot = bot
 		self.filepath = "birthdays.csv"
-		self.perday.start()
 
 	@slash_command(
 		description = "OwenTheBot will wish you happy bday every year! (only do this once!).",
 		options = [Option("date", "YYYY-MM-DD", OptionType.STRING, True)]
 	)
 	async def inputbirthday(self, ctx, date):
-		async with aiofiles.open(self.filepath, "w") as f:
+		async with aiofiles.open(self.filepath, "a") as f:
 			writer = AsyncWriter(f)
 			await writer.writerow([ctx.author.id, date, ctx.channel.id])
 		await ctx.send("Successfully added your birthday " + date + " to the list!")

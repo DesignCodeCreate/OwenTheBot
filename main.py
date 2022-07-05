@@ -4,7 +4,7 @@ from keep_alive import keep_alive
 from discord.ext import commands
 from dislash import InteractionClient
 
-bot = commands.Bot(command_prefix = "!")
+bot = commands.Bot(command_prefix = "!", intents = discord.Intents.all())
 keep_alive.user = "{0.user}".format(bot)
 hello_answers = ["Hello! :)", "Hi!", "What's up?", "Yo!"]
 
@@ -22,11 +22,14 @@ from birthdays import Birthdays
 bot.add_cog(Fun(bot))
 bot.add_cog(Info(bot))
 bot.add_cog(Help(bot))
-bot.add_cog(Birthdays(bot))
+
+birthdays = Birthdays(bot)
+bot.add_cog(birthdays)
 
 @bot.event
 async def on_ready():
 	print("I am now running as {0.user}! :)".format(bot))
+	birthdays.perday.start()
 
 keep_alive()
 try: bot.run(os.environ["token"]) 
