@@ -37,4 +37,5 @@ class Help(commands.Cog):
 		embed.add_field(name = "/catfact", value = "gets a fact about a cat", inline = False)
 		embed.add_field(name = "/meme", value = "shows a funny meme", inline = False)
 		embed.add_field(name = "/inputbirthday", value = "OwenTheBot will send you a happy birthday in the channel you ran the command.", inline = False)
+		embed.add_field(name = "/pokedex", value = "Find out about your favourite pokemon!")
 		await ctx.send(embed = embed)

@@ -1,3 +1,4 @@
+
 import discord
 from discord.ext import commands
 from dislash import slash_command, Option, OptionType
@@ -52,3 +53,22 @@ class Fun(commands.Cog):
 			spoiler2 = f"{spoiler2}||{emojibg}||"
 		
 		await ctx.send(f"{spoiler1}||{findemoji}||{spoiler2}")
+
+
+
+	@slash_command(description = "Get your info about your pokemon!", options = [Option("pokemon", "pokemon", OptionType.STRING)])
+	async def pokedex(self, ctx, pokemon = "pikachu"):
+		pokemons = requests.get(f"https://some-random-api.ml/pokedex?pokemon={pokemon}").json()
+		embed = discord.Embed()
+		embed.colour = discord.Colour.orange()
+		embed.set_image(url = pokemons.get("sprites").get("animated"))
+		embed.add_field(name = "Name", value = pokemons.get("name"))
+		embed.add_field(name = "Type", value = pokemons.get("type"))
+		embed.add_field(name = "Gender", value = pokemons.get("gender"))
+		embed.add_field(name = "Health", value = pokemons.get("stats").get("hp"))
+		embed.add_field(name = "Height", value = pokemons.get("height"))
+		embed.add_field(name = "Evolution", value = pokemons.get("family").get("evolutionstage"))
+		embed.add_field(name = "Info", value = pokemons.get("description"), inline = False)
+		await ctx.send(embed = embed)
+
+	
