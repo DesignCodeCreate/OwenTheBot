@@ -56,7 +56,7 @@ class Fun(commands.Cog):
 
 
 
-	@slash_command(description = "Get your info about your pokemon!", options = [Option("pokemon", "pokemon", OptionType.STRING)])
+	@slash_command(description = "Get your info about your pokemon!", options = [Option("pokemon", "pokemon", OptionType.STRING, required = True)])
 	async def pokedex(self, ctx, pokemon = "pikachu"):
 		pokemons = requests.get(f"https://some-random-api.ml/pokedex?pokemon={pokemon}").json()
 		embed = discord.Embed()
