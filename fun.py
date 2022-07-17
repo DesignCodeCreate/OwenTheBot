@@ -60,11 +60,14 @@ class Fun(commands.Cog):
 	async def pokedex(self, ctx, pokemon = "pikachu"):
 		pokemons = requests.get(f"https://some-random-api.ml/pokedex?pokemon={pokemon}").json()
 		embed = discord.Embed()
+		try: genders = [pokemons.get("gender")[0], pokemons.get("gender")[1]]
+		except IndexError:
+			genders = [pokemons.get("gender")[0]]
 		embed.colour = discord.Colour.orange()
 		embed.set_image(url = pokemons.get("sprites").get("animated"))
 		embed.add_field(name = "Name", value = pokemons.get("name"))
 		embed.add_field(name = "Type", value = pokemons.get("type")[0])
-		embed.add_field(name = "Gender", value = pokemons.get("gender")[0])
+		embed.add_field(name = "Gender", value = ", ".join(genders))
 		embed.add_field(name = "Health", value = pokemons.get("stats").get("hp"))
 		embed.add_field(name = "Height", value = pokemons.get("height"))
 		embed.add_field(name = "Evolution", value = pokemons.get("family").get("evolutionstage"))
