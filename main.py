@@ -27,14 +27,6 @@ bot.add_cog(Help(bot))
 birthdays = Birthdays(bot)
 bot.add_cog(birthdays)
 
-@bot.event
-async def on_message(message):
-	if bot.user.mentioned_in(message):
-		embed = discord.Embed()
-		embed.colour = discord.Colour.orange()
-		embed.set_author(name = random.choice(mention_answers))
-		await message.channel.send(embed = embed)
-
 
 @bot.event
 async def on_ready():
