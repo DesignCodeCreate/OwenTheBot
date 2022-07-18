@@ -22,7 +22,8 @@ class Help(commands.Cog):
 		embed.add_field(name = '@ninjadev64', value = 'Helped with lots of code mostly in the birthday database.', inline = False)
 		embed.add_field(name = "\u200b", value = "\u200b", inline = False)
 		embed.add_field(name = "Random Ideas: ", value = "\u200b")
-		embed.add_field(name = "@Bananana03", value = "The spam and Rickroll Command", inline = False)
+		embed.add_field(name = "@Bananana03", value = "The Rickroll Command", inline = False)
+		embed.add_field(name = "@Snoppysnop", value = "Came up with the spam idea")
 		
 		
 		await ctx.send(embed = embed)
