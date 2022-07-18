@@ -17,8 +17,14 @@ class Help(commands.Cog):
 	async def credits(self, ctx):
 		embed = discord.Embed()
 		embed.colour = discord.Color.orange()
+		embed.add_field(name = "Develepors: ", value = "\u200b")
+		embed.add_field(name = "@DesigningCodingCreating", value = "The original develepor, also made the bot's logo.", inline = False)
+		embed.add_field(name = '@ninjadev64', value = 'Helped with lots of code mostly in the birthday database.', inline = False)
+		embed.add_field(name = "\u200b", value = "\u200b", inline = False)
+		embed.add_field(name = "Random Ideas: ", value = "\u200b")
+		embed.add_field(name = "@Bananana03", value = "The spam and Rickroll Command", inline = False)
 		
-		embed.add_field(name = '@ninjadev64', value = 'He helped with the coding', inline = False)
+		
 		await ctx.send(embed = embed)
 	
 	@slash_command(description = "Gives a list of all the commands")

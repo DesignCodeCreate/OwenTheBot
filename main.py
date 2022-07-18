@@ -1,5 +1,4 @@
 import discord
-import random
 import os
 from keep_alive import keep_alive
 from discord.ext import commands
@@ -26,7 +25,6 @@ bot.add_cog(Help(bot))
 
 birthdays = Birthdays(bot)
 bot.add_cog(birthdays)
-
 
 @bot.event
 async def on_ready():

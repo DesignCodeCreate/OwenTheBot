@@ -1,4 +1,3 @@
-
 import discord
 from discord.ext import commands
 from dislash import slash_command, Option, OptionType
@@ -12,7 +11,7 @@ class Fun(commands.Cog):
 	@slash_command(description = 'Rickroll')
 	async def rickroll(self, ctx):
 		await ctx.send("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-	
+
 	@slash_command(description = "Spams the word you choose!", options = [Option("string", "Word", OptionType.STRING)])
 	async def spam(self, ctx, string = "spam"):
 		string1 = string
@@ -54,24 +53,22 @@ class Fun(commands.Cog):
 		
 		await ctx.send(f"{spoiler1}||{findemoji}||{spoiler2}")
 
-
-
 	@slash_command(description = "Get your info about your pokemon!", options = [Option("pokemon", "pokemon", OptionType.STRING, required = True)])
 	async def pokedex(self, ctx, pokemon = "pikachu"):
-		pokemons = requests.get(f"https://some-random-api.ml/pokedex?pokemon={pokemon}").json()
+		pokemons = requests.get(f"https://some-random-api.ml/pokedex?pokemon={pokemon.title()}").json()
 		embed = discord.Embed()
-		try: genders = [pokemons.get("gender")[0], pokemons.get("gender")[1]]
-		except IndexError:
-			genders = [pokemons.get("gender")[0]]
 		embed.colour = discord.Colour.orange()
+		
 		embed.set_image(url = pokemons.get("sprites").get("animated"))
+		embed.set_author(name = pokemons.get("name"))
 		embed.add_field(name = "Name", value = pokemons.get("name"))
 		embed.add_field(name = "Type", value = pokemons.get("type")[0])
-		embed.add_field(name = "Gender", value = ", ".join(genders))
+		embed.add_field(name = "Gender", value = ", ".join(pokemons.get("gender")))
 		embed.add_field(name = "Health", value = pokemons.get("stats").get("hp"))
 		embed.add_field(name = "Height", value = pokemons.get("height"))
-		embed.add_field(name = "Evolution", value = pokemons.get("family").get("evolutionstage"))
+		embed.add_field(name = "Weight", value = pokemons.get("weight"))
+		embed.add_field(name = "Evolution Line", value = ", ".join(pokemons.get("family").get("evolutionLine")), inline = True)
+		embed.add_field(name = "Evolution Stage", value = pokemons.get("family").get("evolutionStage"))
 		embed.add_field(name = "Info", value = pokemons.get("description"), inline = False)
+		
 		await ctx.send(embed = embed)
-
-	
