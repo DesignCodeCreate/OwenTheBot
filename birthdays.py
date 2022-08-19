@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands, tasks
-from dislash import slash_command, Option, OptionType
+from discord.app_commands import command, describe
 from datetime import datetime
 from aiocsv import AsyncReader, AsyncWriter
 import aiofiles
@@ -25,12 +25,10 @@ class Birthdays(commands.Cog):
 		self.bot = bot
 		self.filepath = "birthdays.csv"
 
-	@slash_command(
-		description = "OwenTheBot will wish you happy bday every year! (only do this once!).",
-		options = [Option("date", "YYYY-MM-DD", OptionType.STRING, True)]
-	)
-	async def inputbirthday(self, ctx, date):
+	@command(description = "@OwenTheBot will wish you happy bday every year! (only do this once!).")
+	@describe(date = "YYYY-MM-DD")
+	async def inputbirthday(self, ctx, date: str):
 		async with aiofiles.open(self.filepath, "a") as f:
 			writer = AsyncWriter(f)
-			await writer.writerow([ctx.author.id, date, ctx.channel.id])
-		await ctx.send("Successfully added your birthday " + date + " to the list!")
+			await writer.writerow([ctx.user.id, date, ctx.channel.id])
+		await ctx.response.send_message("Successfully added your birthday " + date + " to the list!")

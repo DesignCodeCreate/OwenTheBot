@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from dislash import slash_command, Option, OptionType
+from discord.app_commands import command, describe
 from random import randint
 import requests
 
@@ -19,21 +19,18 @@ class Fun(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@slash_command(description="Rickroll")
+	@command(description="Rickroll")
 	async def rickroll(self, ctx):
-		await ctx.send("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+		await ctx.response.send_message("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
-	@slash_command(
-		description="Spams the word you choose!",
-		options=[Option("word", "Word", OptionType.STRING)],
-	)
-	async def spam(self, ctx, string="spam"):
-		string1 = string
+	@command(description="Spams the word you choose!")
+	async def spam(self, ctx, word: str = "spam"):
+		string = word
 		for i in range(200):
-			string = f"{string} {string1}"
-		await ctx.send(string)
+			string = f"{word} {string}"
+		await ctx.response.send_message(string)
 
-	@slash_command(description="Cat facts")
+	@command(description="Cat facts")
 	async def catfact(self, ctx):
 		cat = requests.get("https://some-random-api.ml/animal/cat").json()
 		embed = discord.Embed()
@@ -44,25 +41,19 @@ class Fun(commands.Cog):
 			text="Powered by Some Random API",
 			icon_url="https://i.some-random-api.ml/logo.png",
 		)
-		await ctx.send(embed=embed)
+		await ctx.response.send_message(embed=embed)
 
-	@slash_command(description="Bad Memes")
+	@command(description="Bad Memes")
 	async def meme(self, ctx):
 		meme = requests.get("https://some-random-api.ml/meme").json()
 		embed = discord.Embed()
 		embed.colour = discord.Colour.orange()
 		embed.set_image(url=meme.get("image"))
 		embed.set_footer(text=meme.get("caption"))
-		await ctx.send(embed=embed)
+		await ctx.response.send_message(embed=embed)
 
-	@slash_command(
-		description="Mini emoji search",
-		options=[
-			Option("findemoji", "Emoji", OptionType.STRING, True),
-			Option("emojibg", "Emoji", OptionType.STRING, True),
-		],
-	)
-	async def emojisearch(self, ctx, findemoji="", emojibg=""):
+	@command(description="Mini emoji search")
+	async def emojisearch(self, ctx, findemoji: str, emojibg: str):
 		spoiler1 = f"||{emojibg}||"
 		spoiler2 = f"||{emojibg}||"
 		rand = randint(0, 99)
@@ -71,16 +62,12 @@ class Fun(commands.Cog):
 		for i in range(200 - rand):
 			spoiler2 = f"{spoiler2}||{emojibg}||"
 
-		await ctx.send(f"{spoiler1}||{findemoji}||{spoiler2}")
+		await ctx.response.send_message(f"{spoiler1}||{findemoji}||{spoiler2}")
 
-	@slash_command(
-		description="Get your info about your pokemon!",
-		options=[Option("pokemon", "pokemon", OptionType.STRING, required=True)],
-	)
-	async def pokedex(self, ctx, pokemon="pikachu"):
-		pokemons = requests.get(
-			f"https://some-random-api.ml/pokedex?pokemon={pokemon.title()}"
-		).json()
+	@command(description="Get your info about your pokemon!")
+	async def pokedex(self, ctx, pokemon: str):
+		pokemons = requests.get(f"https://some-random-api.ml/pokedex?pokemon={pokemon.title()}").json()
+		
 		embed = discord.Embed()
 		embed.colour = discord.Colour.orange()
 
@@ -97,21 +84,19 @@ class Fun(commands.Cog):
 			value=", ".join(pokemons.get("family").get("evolutionLine")),
 			inline=True,
 		)
-		embed.add_field(
-			name="Evolution Stage", value=pokemons.get("family").get("evolutionStage")
-		)
+		embed.add_field(name="Evolution Stage", value=pokemons.get("family").get("evolutionStage"))
 		embed.add_field(name="Info", value=pokemons.get("description"), inline=False)
 
-		await ctx.send(embed=embed)
-
-'''@slash_command(description="Play the Wordle game!")
+		await ctx.response.send_message(embed=embed)
+		
+'''@command(description="Play the Wordle game!")
 	async def wordle(self, ctx):
 		word = words[randint(0, 2291)]
 		answers[ctx.author.id] = word
 		embed = discord.Embed()
 		embed.colour = discord.Colour.orange()
 		embed.add_field(name="word", value=word)
-		await ctx.send(embed=embed)
+		await ctx.response.send_message(embed=embed)
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
