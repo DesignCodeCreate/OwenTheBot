@@ -13,8 +13,8 @@ def home():
 
 def run():
 	from waitress import serve
-	serve(app, host='0.0.0.0', port=8080)
+	serve(app, host = '0.0.0.0', port = 8080)
 
 def keep_alive():
-    t = Thread(target=run)
+    t = Thread(target = run)
     t.start()

@@ -7,13 +7,10 @@ import requests
 words = open("words.txt").read().splitlines()
 all_words = open("all_words.txt").read().splitlines()
 
-
 def is_valid_word(word):
 	return word.lower() in all_words
 
-
 answers = {}
-
 
 class Fun(commands.Cog):
 	def __init__(self, bot):

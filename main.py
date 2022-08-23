@@ -10,6 +10,7 @@ from info import Info
 from help import Help
 from quiz import Quiz
 from birthdays import Birthdays
+from points import Points
 
 class Bot(commands.Bot):
 	async def setup_hook(self):
@@ -17,9 +18,10 @@ class Bot(commands.Bot):
 		await self.add_cog(Info(self))
 		await self.add_cog(Help(self))
 		await self.add_cog(Quiz(self))
-
+		await self.add_cog(Points(self))
 		self.birthday_cog = Birthdays(self)
 		await self.add_cog(self.birthday_cog)
+		await self.tree.sync()
 
 bot = Bot(command_prefix = "!", intents = discord.Intents.all())
 
