@@ -1,17 +1,22 @@
 import discord
 from discord.ext import commands
 from discord.app_commands import command, describe
-
+from discord.ui import Button, View
+from discord import ButtonStyle	
 class Help(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		
 	@command(description = 'Invite to your server!')
 	async def invite(self, ctx):
+		button = Button(label = "Invite", style = discord.ButtonStyle.url, url = "https://discord.com/api/oauth2/authorize?client_id=973939317900734555&permissions=139586948160&scope=applications.commands%20bot")
+		view = View()
 		embed = discord.Embed()
 		embed.colour = discord.Colour.orange()
-		embed.add_field(name = "Invite to Server", value = "[Invite here](https://discord.com/api/oauth2/authorize?client_id=973939317900734555&permissions=139586948160&scope=applications.commands%20bot)")
-		await ctx.response.send_message(embed = embed)
+		embed.add_field(name = "Invite to Server", value = "Click the button to invite!")
+		view.add_item(button)
+		await ctx.response.send_message(embed = embed, view = view)
+		
 		
 	@command(description = "Shows who helped with the bots' creation!")
 	async def credits(self, ctx):
