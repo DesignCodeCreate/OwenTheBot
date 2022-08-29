@@ -10,7 +10,7 @@ class Info(commands.Cog):
 		self.bot = bot
 		self.weatherkey = environ['weatherkey']
 
-	@command(description = "Does Math Sums")
+	@command(description = "Does maths")
 	@describe(calculation = "Math calculation", secret = "Only sent to you")
 	async def math(self, ctx, calculation: str = "1+1", secret: typing.Optional[bool] = False):
 		embed = discord.Embed()
@@ -47,8 +47,8 @@ class Info(commands.Cog):
 		elif option == "humidity":
 			embed.add_field(name = "Humidity", value = str(weather.get("main").get("humidity")) + "%")
 		elif option == "wind":
-			embed.add_field(name = "Wind Speed", value = str(weather.get("wind").get("speed")))
+			embed.add_field(name = "Wind speed", value = str(weather.get("wind").get("speed")))
 		else:
-			embed.add_field(name = "Sorry, there is no such command")
+			embed.add_field(name = f"Sorry, there is no such option {option}")
 			
 		await ctx.response.send_message(embed = embed)

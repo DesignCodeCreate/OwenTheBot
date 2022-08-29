@@ -1,8 +1,6 @@
 from flask import Flask
 from threading import Thread
-app = Flask('')
-
-user = None
+app = Flask("OwenTheBot")
 
 @app.route('/')
 def home():

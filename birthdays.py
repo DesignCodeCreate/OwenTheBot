@@ -6,7 +6,7 @@ from aiocsv import AsyncReader, AsyncWriter
 import aiofiles
 
 class Birthdays(commands.Cog):
-	@tasks.loop(seconds = 86400) # seconds in the day
+	@tasks.loop(seconds = 86400) # check every day
 	async def perday(self):
 		now = datetime.now()
 		async with aiofiles.open(self.filepath, mode = "r") as f:

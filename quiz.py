@@ -134,7 +134,7 @@ class Quiz(commands.Cog):
 		
 		await game.thread.send(embed = embed, view = view)
 
-	@command(description = "Play a 4 Player Trivia Game!")
+	@command(description = "Play a 4-player trivia game!")
 	@describe(p2 = "Player 2", p3 = "Player 3", p4 = "Player 4")
 	async def quiz(
 		self, ctx,

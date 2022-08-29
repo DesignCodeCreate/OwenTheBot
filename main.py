@@ -14,13 +14,19 @@ from points import Points
 
 class Bot(commands.Bot):
 	async def setup_hook(self):
-		await self.add_cog(Fun(self))
-		await self.add_cog(Info(self))
-		await self.add_cog(Help(self))
-		await self.add_cog(Quiz(self))
-		await self.add_cog(Points(self))
-		self.birthday_cog = Birthdays(self)
-		await self.add_cog(self.birthday_cog)
+		fun = Fun(self)
+		info = Info(self)
+		quiz = Quiz(self)
+		points = Points(self)
+		self.birthdays = Birthdays(self)
+		
+		await self.add_cog(fun)
+		await self.add_cog(info)
+		await self.add_cog(quiz)
+		await self.add_cog(points)
+		await self.add_cog(self.birthdays)
+		
+		await self.add_cog(Help(self, fun, info, quiz, points, self.birthdays))
 		await self.tree.sync()
 
 bot = Bot(command_prefix = "!", intents = discord.Intents.all())
@@ -30,7 +36,8 @@ keep_alive.user = "{0.user}".format(bot)
 @bot.event
 async def on_ready():
 	print("I am now running as {0.user}! :)".format(bot))
-	bot.birthday_cog.perday.start()
+	if not bot.birthdays.perday.is_running():
+		bot.birthdays.perday.start()
 
 @bot.event
 async def on_message(message):

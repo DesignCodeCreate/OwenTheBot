@@ -3,6 +3,8 @@ from discord.ext import commands
 from discord.app_commands import command, describe
 from random import randint
 import requests
+from requests import get
+from os import environ
 
 words = open("words.txt").read().splitlines()
 all_words = open("all_words.txt").read().splitlines()
@@ -10,24 +12,26 @@ all_words = open("all_words.txt").read().splitlines()
 def is_valid_word(word):
 	return word.lower() in all_words
 
-answers = {}
+channels = {}
+game_end = {}
+word_dict = {}
 
 class Fun(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@command(description="Rickroll")
+	@command(description = "Rickroll")
 	async def rickroll(self, ctx):
 		await ctx.response.send_message("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
-	@command(description="Spams the word you choose!")
+	@command(description = "Spams the word you choose!")
 	async def spam(self, ctx, word: str = "spam"):
 		string = word
 		for i in range(200):
 			string = f"{word} {string}"
 		await ctx.response.send_message(string)
 
-	@command(description="Cat facts")
+	@command(description = "Cat facts")
 	async def catfact(self, ctx):
 		cat = requests.get("https://some-random-api.ml/animal/cat").json()
 		embed = discord.Embed()
@@ -40,7 +44,7 @@ class Fun(commands.Cog):
 		)
 		await ctx.response.send_message(embed=embed)
 
-	@command(description="Bad Memes")
+	@command(description = "Bad memes")
 	async def meme(self, ctx):
 		meme = requests.get("https://some-random-api.ml/meme").json()
 		embed = discord.Embed()
@@ -49,7 +53,7 @@ class Fun(commands.Cog):
 		embed.set_footer(text=meme.get("caption"))
 		await ctx.response.send_message(embed=embed)
 
-	@command(description="Mini emoji search")
+	@command(description = "Mini emoji search")
 	async def emojisearch(self, ctx, findemoji: str, emojibg: str):
 		spoiler1 = f"||{emojibg}||"
 		spoiler2 = f"||{emojibg}||"
@@ -61,7 +65,7 @@ class Fun(commands.Cog):
 
 		await ctx.response.send_message(f"{spoiler1}||{findemoji}||{spoiler2}")
 
-	@command(description="Get your info about your pokemon!")
+	@command(description = "Get info about your pokemon!")
 	async def pokedex(self, ctx, pokemon: str):
 		pokemons = requests.get(f"https://some-random-api.ml/pokedex?pokemon={pokemon.title()}").json()
 		
@@ -84,23 +88,46 @@ class Fun(commands.Cog):
 		embed.add_field(name="Evolution Stage", value=pokemons.get("family").get("evolutionStage"))
 		embed.add_field(name="Info", value=pokemons.get("description"), inline=False)
 
-		await ctx.response.send_message(embed=embed)
+		await ctx.response.send_message(embed = embed)
 		
-'''@command(description="Play the Wordle game!")
-	async def wordle(self, ctx):
-		word = words[randint(0, 2291)]
-		answers[ctx.author.id] = word
+	@command(description = "Play the Wurdle game!")
+	async def wurdle(self, ctx):
+		channels[ctx.user.id] = ctx.channel.id
+		game_end[ctx.user.id] = False
+		word_dict[ctx.user.id] = words[randint(0, 2291)]
+		
 		embed = discord.Embed()
 		embed.colour = discord.Colour.orange()
-		embed.add_field(name="word", value=word)
-		await ctx.response.send_message(embed=embed)
+		embed.add_field(name = "Word", value = word_dict[ctx.user.id])
+		await ctx.response.send_message(embed = embed)
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
-		if message.content == answers.get(message.author.id):
-			await message.reply("That's the correct answer!")
-			del answers[message.author.id]
-		elif message.author != self.bot.id:
-			await message.reply("Keep trying!", delete_after=5)
-			await message.delete(delay=5)
-'''
+		if message.author == self.bot.user: return
+		if channels.get(message.author.id) != message.channel.id: return
+		if game_end.get(message.author.id) == True: return
+		if message.content == word_dict.get(message.author.id):
+			embed = discord.Embed()
+			embed.colour = discord.Colour.orange()
+			embed.add_field(name = "Well done!", value = "You won 10 Fruity Points!")
+			await message.reply(embed = embed, delete_after = 30)
+			await message.delete()
+			game_end[message.author.id] = True
+			user = message.author.id
+			# implementing Fruity Points
+			get(f"https://fruitypointsapi.ninjadev64.repl.co/modify_points?key={environ['fruitykey']}&id={user}&amount=10")
+		else:
+			await message.reply("""
+   You're not quite there yet. Keep trying!
+   Remember, you can use /wurdlestop to end the game!""",
+				delete_after = 2
+			)
+			await message.delete()
+
+	@command(description = "Use this command to stop your Wurdle game.")
+	async def wurdlestop(self, ctx):
+		embed = discord.Embed()
+		embed.colour = discord.Colour.orange()
+		embed.add_field(name = "The game ended", value = "Good try!")
+		game_end[ctx.user.id] = True
+		await ctx.response.send_message(embed = embed)
