@@ -1,7 +1,7 @@
 import discord
 import os
 from keep_alive import keep_alive
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.utils import get
 
 # import cogs (groups of commands)
@@ -33,11 +33,22 @@ bot = Bot(command_prefix = "!", intents = discord.Intents.all())
 
 keep_alive.user = "{0.user}".format(bot)
 
+@tasks.loop(seconds = 600)
+async def update_status():
+	await bot.change_presence(activity = discord.Streaming(
+		name = f"/help! ¦ {len(bot.guilds)} servers",
+		url = "https://www.youtube.com/watch?v=xvFZjo5PgG0"
+	))
 @bot.event
 async def on_ready():
 	print("I am now running as {0.user}! :)".format(bot))
+	print("{0.user}".format(bot), "is in", len(bot.guilds), "servers!")
+	print()
+	for count, guild in enumerate(bot.guilds, start = 1):
+		print(count, guild.name)
 	if not bot.birthdays.perday.is_running():
 		bot.birthdays.perday.start()
+	update_status.start()
 
 @bot.event
 async def on_message(message):

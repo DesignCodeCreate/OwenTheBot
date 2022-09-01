@@ -6,6 +6,8 @@ import requests
 from requests import get
 from os import environ
 
+from colorama import Fore
+
 words = open("words.txt").read().splitlines()
 all_words = open("all_words.txt").read().splitlines()
 
@@ -13,8 +15,11 @@ def is_valid_word(word):
 	return word.lower() in all_words
 
 channels = {}
+answers = {}
+
 game_end = {}
-word_dict = {}
+wurdle_guesses = {}
+wurdle_embeds = {}
 
 class Fun(commands.Cog):
 	def __init__(self, bot):
@@ -36,22 +41,22 @@ class Fun(commands.Cog):
 		cat = requests.get("https://some-random-api.ml/animal/cat").json()
 		embed = discord.Embed()
 		embed.colour = discord.Colour.orange()
-		embed.set_image(url=cat.get("image"))
-		embed.add_field(name="Cat Fact", value=cat.get("fact"))
+		embed.set_image(url = cat.get("image"))
+		embed.add_field(name = "Cat Fact", value = cat.get("fact"))
 		embed.set_footer(
-			text="Powered by Some Random API",
-			icon_url="https://i.some-random-api.ml/logo.png",
+			text = "Powered by Some Random API",
+			icon_url = "https://i.some-random-api.ml/logo.png",
 		)
-		await ctx.response.send_message(embed=embed)
+		await ctx.response.send_message(embed = embed)
 
 	@command(description = "Bad memes")
 	async def meme(self, ctx):
 		meme = requests.get("https://some-random-api.ml/meme").json()
 		embed = discord.Embed()
 		embed.colour = discord.Colour.orange()
-		embed.set_image(url=meme.get("image"))
-		embed.set_footer(text=meme.get("caption"))
-		await ctx.response.send_message(embed=embed)
+		embed.set_image(url = meme.get("image"))
+		embed.set_footer(text = meme.get("caption"))
+		await ctx.response.send_message(embed = embed)
 
 	@command(description = "Mini emoji search")
 	async def emojisearch(self, ctx, findemoji: str, emojibg: str):
@@ -94,40 +99,61 @@ class Fun(commands.Cog):
 	async def wurdle(self, ctx):
 		channels[ctx.user.id] = ctx.channel.id
 		game_end[ctx.user.id] = False
-		word_dict[ctx.user.id] = words[randint(0, 2291)]
+		answers[ctx.user.id] = words[randint(0, 2291)]
+		wurdle_guesses[ctx.user.id] = []
 		
 		embed = discord.Embed()
 		embed.colour = discord.Colour.orange()
-		embed.add_field(name = "Word", value = word_dict[ctx.user.id])
+		embed.add_field(name = "Wurdle", value = "\u200b")
 		await ctx.response.send_message(embed = embed)
+		wurdle_embeds[ctx.user.id] = await ctx.original_response()
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
 		if message.author == self.bot.user: return
 		if channels.get(message.author.id) != message.channel.id: return
 		if game_end.get(message.author.id) == True: return
-		if message.content == word_dict.get(message.author.id):
+		if message.content == answers.get(message.author.id):
 			embed = discord.Embed()
 			embed.colour = discord.Colour.orange()
-			embed.add_field(name = "Well done!", value = "You won 10 Fruity Points!")
+			embed.add_field(name = "Well done!", value = f"You won {6-len(wurdle_guesses.get(message.author.id))} Fruity Points!")
 			await message.reply(embed = embed, delete_after = 30)
 			await message.delete()
+			global answer
+			answer = answers.get(message.author.id)
 			game_end[message.author.id] = True
-			user = message.author.id
 			# implementing Fruity Points
-			get(f"https://fruitypointsapi.ninjadev64.repl.co/modify_points?key={environ['fruitykey']}&id={user}&amount=10")
+			get(f"https://fruitypointsapi.ninjadev64.repl.co/modify_points?key={environ['fruitykey']}&id={message.author.id}&amount={6-len(wurdle_guesses.get(message.author.id))}")
 		else:
-			await message.reply("""
-   You're not quite there yet. Keep trying!
-   Remember, you can use /wurdlestop to end the game!""",
-				delete_after = 2
-			)
+			if message.content.lower() in all_words:
+				wurdle_guesses.get(message.author.id).append(message.content.lower())
+				embed = discord.Embed(color = discord.Colour.orange())	
+
+				content = ""
+				answer = answers.get(message.author.id)
+				for guess in wurdle_guesses.get(message.author.id):
+					for x, y in zip(answer, guess):
+						if x == y:
+							content+=f"{Fore.GREEN}{y}{Fore.RESET}" # green
+						elif y in answer:
+							content+=f"{Fore.YELLOW}{y}{Fore.RESET}" # yellow
+						else:
+							content+=y # normal
+					content+="\n"
+				
+				embed.add_field(name = "Wurdle", value = f"""```ansi\n{content}\n```""")
+				await wurdle_embeds.get(message.author.id).edit(embed = embed)
+			else:
+				embed = discord.Embed(color = discord.Colour.orange())
+				embed.add_field(name = "Not valid", value = "Please enter a valid 5-letter word")
+				await message.reply(embed = embed, delete_after = 5)
 			await message.delete()
 
 	@command(description = "Use this command to stop your Wurdle game.")
 	async def wurdlestop(self, ctx):
+		global answer
 		embed = discord.Embed()
 		embed.colour = discord.Colour.orange()
-		embed.add_field(name = "The game ended", value = "Good try!")
+		embed.add_field(name = "The game ended", value = f"The word was {answer}")
 		game_end[ctx.user.id] = True
 		await ctx.response.send_message(embed = embed)
