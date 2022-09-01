@@ -5,6 +5,7 @@ from random import randint
 import requests
 from requests import get
 from os import environ
+import typing
 
 from colorama import Fore
 
@@ -27,7 +28,7 @@ class Fun(commands.Cog):
 
 	@command(description = "Rickroll")
 	async def rickroll(self, ctx):
-		await ctx.response.send_message("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+		await ctx.response.send_message("https://www.youtube.com/watch?v=xvFZjo5PgG0")
 
 	@command(description = "Spams the word you choose!")
 	async def spam(self, ctx, word: str = "spam"):
@@ -96,7 +97,8 @@ class Fun(commands.Cog):
 		await ctx.response.send_message(embed = embed)
 		
 	@command(description = "Play the Wurdle game!")
-	async def wurdle(self, ctx):
+	@describe(beta = "This is a beta command")
+	async def wurdle(self, ctx, beta: typing.Optional[str]):
 		channels[ctx.user.id] = ctx.channel.id
 		game_end[ctx.user.id] = False
 		answers[ctx.user.id] = words[randint(0, 2291)]
@@ -119,8 +121,6 @@ class Fun(commands.Cog):
 			embed.add_field(name = "Well done!", value = f"You won {6-len(wurdle_guesses.get(message.author.id))} Fruity Points!")
 			await message.reply(embed = embed, delete_after = 30)
 			await message.delete()
-			global answer
-			answer = answers.get(message.author.id)
 			game_end[message.author.id] = True
 			# implementing Fruity Points
 			get(f"https://fruitypointsapi.ninjadev64.repl.co/modify_points?key={environ['fruitykey']}&id={message.author.id}&amount={6-len(wurdle_guesses.get(message.author.id))}")
@@ -151,9 +151,8 @@ class Fun(commands.Cog):
 
 	@command(description = "Use this command to stop your Wurdle game.")
 	async def wurdlestop(self, ctx):
-		global answer
 		embed = discord.Embed()
 		embed.colour = discord.Colour.orange()
-		embed.add_field(name = "The game ended", value = f"The word was {answer}")
+		embed.add_field(name = "The game ended", value = f"The word was {answers.get(ctx.user.id)}")
 		game_end[ctx.user.id] = True
 		await ctx.response.send_message(embed = embed)

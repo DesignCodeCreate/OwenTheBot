@@ -4,8 +4,13 @@ from discord.app_commands import command, describe
 from datetime import datetime
 from aiocsv import AsyncReader, AsyncWriter
 import aiofiles
+from datetime import datetime
 
 class Birthdays(commands.Cog):
+	def __init__(self, bot):
+		self.bot = bot
+		self.filepath = "birthdays.csv"
+		
 	@tasks.loop(seconds = 86400) # check every day
 	async def perday(self):
 		now = datetime.now()
@@ -16,18 +21,14 @@ class Birthdays(commands.Cog):
 					user = await self.bot.fetch_user(row[0])
 					embed = discord.Embed()
 					embed.color = discord.Colour.orange()
-					embed.add_field(name = "Happy birthday!", value = "It's " + user.name + "'s birthday! 🥳")
+					embed.add_field(name = "Happy birthday!", value = f"It's {user.name}'s birthday! 🥳")
 
 					channel = await self.bot.fetch_channel(row[2])
 					await channel.send(embed = embed)
-	
-	def __init__(self, bot):
-		self.bot = bot
-		self.filepath = "birthdays.csv"
 
 	@command(description = "@OwenTheBot will wish you happy bday every year! (only do this once!).")
-	@describe(date = "YYYY-MM-DD")
-	async def inputbirthday(self, ctx, date: str):
+	async def inputbirthday(self, ctx, day: int, month: int, year: int):
+		date = datetime(year, month, day).strftime("%Y-%m-%d")
 		async with aiofiles.open(self.filepath, "a") as f:
 			writer = AsyncWriter(f)
 			await writer.writerow([ctx.user.id, date, ctx.channel.id])
