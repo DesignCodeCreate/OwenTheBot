@@ -11,22 +11,18 @@ from help import Help
 from quiz import Quiz
 from birthdays import Birthdays
 from points import Points
-
+from other import Other
 class Bot(commands.Bot):
 	async def setup_hook(self):
-		fun = Fun(self)
-		info = Info(self)
-		quiz = Quiz(self)
-		points = Points(self)
+		await self.add_cog(Fun(self))
+		await self.add_cog(Other(self))
+		await self.add_cog(Info(self))
+		await self.add_cog(Quiz(self))
+		await self.add_cog(Points(self))
 		self.birthdays = Birthdays(self)
-		
-		await self.add_cog(fun)
-		await self.add_cog(info)
-		await self.add_cog(quiz)
-		await self.add_cog(points)
 		await self.add_cog(self.birthdays)
 		
-		await self.add_cog(Help(self, fun, info, quiz, points, self.birthdays))
+		await self.add_cog(Help(self))
 		await self.tree.sync()
 
 bot = Bot(command_prefix = "!", intents = discord.Intents.all())
@@ -37,7 +33,7 @@ async def update_status():
 		name = f"/help! ¦ {len(bot.guilds)} servers",
 		url = "https://www.youtube.com/watch?v=xvFZjo5PgG0"
 	))
-	
+
 @bot.event
 async def on_ready():
 	print(f"I am now running as {bot.user} in {len(bot.guilds)} servers! :)\n")

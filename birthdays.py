@@ -26,7 +26,7 @@ class Birthdays(commands.Cog):
 					channel = await self.bot.fetch_channel(row[2])
 					await channel.send(embed = embed)
 
-	@command(description = "@OwenTheBot will wish you happy bday every year! (only do this once!).")
+	@command(description = "OwenTheBot will wish you happy bday every year! (only do this once!).")
 	async def inputbirthday(self, ctx, day: int, month: int, year: int):
 		date = datetime(year, month, day).strftime("%Y-%m-%d")
 		async with aiofiles.open(self.filepath, "a") as f:

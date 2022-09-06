@@ -21,6 +21,7 @@ answers = {}
 game_end = {}
 wurdle_guesses = {}
 wurdle_embeds = {}
+riddle_dict = {}
 
 class Fun(commands.Cog):
 	def __init__(self, bot):
@@ -156,3 +157,30 @@ class Fun(commands.Cog):
 		embed.add_field(name = "The game ended", value = f"The word was {answers.get(ctx.user.id)}")
 		game_end[ctx.user.id] = True
 		await ctx.response.send_message(embed = embed)
+		
+	@command(description = "Answer A random riddle and get 5 fruity points if you get it right!")
+	async def riddle(self, ctx):
+		json = requests.get("https://riddles-api.vercel.app/random").json()
+		global riddle_ans
+		riddle_ans = riddle_dict.get(ctx.user.id)
+		riddle_dict[ctx.user.id] = json.get("answer")
+		embed = discord.Embed()
+		embed.colour = discord.Colour.orange()
+		embed.add_field(name = "Riddle", value = json.get("riddle"))
+		embed.add_field
+		await ctx.response.send_message(embed = embed)
+		
+	@command(description = "Get the answer to your riddle!")
+	async def riddle_answer(self, ctx):
+		answer = riddle_dict.get(ctx.user.id)
+		if answer is None:
+			embed = discord.Embed()
+			embed.colour = discord.Colour.orange()
+			embed.add_field(name = "No command", value = "You didn't do a riddle!")
+			await ctx.response.send_message(embed = embed, ephemeral = True)
+			return
+		embed = discord.Embed()
+		embed.colour = discord.Colour.orange()
+		embed.add_field(name = "Latest answer", value = f"The answer was {answer}!")
+		await ctx.response.send_message(embed = embed)
+		
