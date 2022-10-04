@@ -1,5 +1,6 @@
 import typing
 import discord
+from discord.ui import View, Select
 from discord.ext import commands
 from discord.app_commands import command, describe, choices, Choice
 from os import environ
@@ -52,3 +53,8 @@ class Info(commands.Cog):
 			embed.add_field(name = f"Sorry, there is no such option {option}")
 			
 		await ctx.response.send_message(embed = embed)
+
+
+
+		
+		

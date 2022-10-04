@@ -158,7 +158,7 @@ class Fun(commands.Cog):
 		game_end[ctx.user.id] = True
 		await ctx.response.send_message(embed = embed)
 		
-	@command(description = "Answer A random riddle and get 5 fruity points if you get it right!")
+	@command(description = "Answer A random riddle!")
 	async def riddle(self, ctx):
 		json = requests.get("https://riddles-api.vercel.app/random").json()
 		global riddle_ans

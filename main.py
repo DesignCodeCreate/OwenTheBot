@@ -12,6 +12,8 @@ from quiz import Quiz
 from birthdays import Birthdays
 from points import Points
 from other import Other
+from server_list import ServerList
+
 class Bot(commands.Bot):
 	async def setup_hook(self):
 		await self.add_cog(Fun(self))
@@ -21,7 +23,7 @@ class Bot(commands.Bot):
 		await self.add_cog(Points(self))
 		self.birthdays = Birthdays(self)
 		await self.add_cog(self.birthdays)
-		
+		await self.add_cog(ServerList(self))
 		await self.add_cog(Help(self))
 		await self.tree.sync()
 
@@ -37,6 +39,10 @@ async def update_status():
 @bot.event
 async def on_ready():
 	print(f"I am now running as {bot.user} in {len(bot.guilds)} servers! :)\n")
+	global c
+	global names
+	names = []
+	
 	for count, guild in enumerate(bot.guilds, start = 1):
 		print(count, guild.name)
 	if not bot.birthdays.perday.is_running():
