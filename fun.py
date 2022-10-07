@@ -183,4 +183,12 @@ class Fun(commands.Cog):
 		embed.colour = discord.Colour.orange()
 		embed.add_field(name = "Latest answer", value = f"The answer was {answer}!")
 		await ctx.response.send_message(embed = embed)
-		
+
+	@command(description = "Get the number of pieces in a rubix cube.")
+	async def cube(self, ctx, sides: int):
+		x = sides * sides * sides - (sides - 2) * (sides - 2) * (sides - 2)
+		embed = discord.Embed(
+			colour = discord.Colour.orange()
+		)
+		embed.add_field(name = "Number of pieces", value = x)
+		await ctx.response.send_message(embed = embed)
