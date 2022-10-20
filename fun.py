@@ -1,32 +1,37 @@
 import discord
 from discord.ext import commands
 from discord.app_commands import command, describe
+from discord.ui import Button, View, Select
+from discord import ButtonStyle
 from random import randint
 import requests
 from requests import get
 from os import environ
 import typing
-
+import random
 from colorama import Fore
+
+
 
 words = open("words.txt").read().splitlines()
 all_words = open("all_words.txt").read().splitlines()
 
 def is_valid_word(word):
 	return word.lower() in all_words
-
+img1 = {}
 channels = {}
 answers = {}
-
+callback_check = {}
 game_end = {}
 wurdle_guesses = {}
 wurdle_embeds = {}
 riddle_dict = {}
 
+number = {}
+computerguess = {}
 class Fun(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-
 	@command(description = "Rickroll")
 	async def rickroll(self, ctx):
 		await ctx.response.send_message("https://www.youtube.com/watch?v=xvFZjo5PgG0")
@@ -74,7 +79,7 @@ class Fun(commands.Cog):
 
 	@command(description = "Get info about your pokemon!")
 	async def pokedex(self, ctx, pokemon: str):
-		pokemons = requests.get(f"https://some-random-api.ml/pokedex?pokemon={pokemon.title()}").json()
+		pokemons = requests.get(f"https://some-random-api.ml/pokemon/pokedex?pokemon={pokemon.title()}").json()
 		
 		embed = discord.Embed()
 		embed.colour = discord.Colour.orange()
@@ -192,3 +197,96 @@ class Fun(commands.Cog):
 		)
 		embed.add_field(name = "Number of pieces", value = x)
 		await ctx.response.send_message(embed = embed)
+
+	@command(description = "Play a game of Rock Paper Scissors with the computer!")
+	async def rpc(self, ctx):
+		computer = True
+		select = Select(
+			options = [
+				discord.SelectOption(label = "Rock", emoji = "🪨"),
+				discord.SelectOption(label = "Paper", emoji = "🧻"),
+				discord.SelectOption(label = "Scissors", emoji = "✂️")
+			]
+		)
+		select.disabled = False
+		if computer:
+			choices = {1: "Rock", 2: "Paper", 3: "Scissors"}
+			minusamount = "-1"
+			addamount = "2"
+			number[ctx.user.id] = random.randint(1, 3)
+			computerguess[ctx.user.id] = choices.get(number.get(ctx.user.id))	
+			view = View()
+			view.add_item(select)
+			embed = discord.Embed()
+			embed.colour = discord.Colour.orange()
+			embed.add_field(name = "Choose One", value = "Choose your option for the game!")
+			await ctx.response.send_message(embed = embed, view = view)
+		async def callback_comp(ctx):
+			if (callback_check.get(ctx.user.id)): return
+			callback_check[ctx.user.id] = True
+			select.disabled = True
+			if computerguess.get(ctx.user.id) == "Rock":
+				if select.values[0] == "Scissors":
+					embed = discord.Embed()
+					embed.colour = discord.Colour.red()
+					embed.add_field(name = "Unlucky!", value = f"You lose! The computer chose {computerguess.get(ctx.user.id)} (-1 fruity point)")
+					requests.get(f"https://fruitypointsapi.ninjadev64.repl.co/modify_points?key={environ['fruitykey']}&id={ctx.user.id}&amount={minusamount}")
+					select.disabled = True
+					await ctx.response.send_message(embed = embed)
+				elif select.values[0] == "Paper":
+					embed = discord.Embed()
+					embed.colour = discord.Colour.green()
+					embed.add_field(name = "Yes!", value = f"You win! The computer chose {computerguess.get(ctx.user.id)}! (+2 fruity points)")
+					requests.get(f"https://fruitypointsapi.ninjadev64.repl.co/modify_points?key={environ['fruitykey']}&id={ctx.user.id}&amount={addamount}")
+					select.disabled = True
+					await ctx.response.send_message(embed = embed)
+				else:
+					embed = discord.Embed()
+					embed.colour = discord.Colour.orange()
+					embed.add_field(name = "Tie!", value = "It was a draw!")
+					select.disabled = True
+					await ctx.response.send_message(embed = embed)
+			elif computerguess.get(ctx.user.id) == "Paper":
+				if select.values[0] == "Rock":
+					embed = discord.Embed()
+					embed.colour = discord.Colour.red()
+					embed.add_field(name = "Unlucky!", value = f"You lose! The computer chose {computerguess.get(ctx.user.id)} (-1 fruity point)")
+					requests.get(f"https://fruitypointsapi.ninjadev64.repl.co/modify_points?key={environ['fruitykey']}&id={ctx.user.id}&amount={minusamount}")
+					select.disabled = True
+					await ctx.response.send_message(embed = embed)
+				elif select.values[0] == "Scissors":
+					embed = discord.Embed()
+					embed.colour = discord.Colour.green()
+					embed.add_field(name = "Yes!", value = f"You win! The computer chose {computerguess.get(ctx.user.id)}! (+2 fruity points)")
+					requests.get(f"https://fruitypointsapi.ninjadev64.repl.co/modify_points?key={environ['fruitykey']}&id={ctx.user.id}&amount={addamount}")
+					select.disabled = True
+					await ctx.response.send_message(embed = embed)
+				else:
+					embed = discord.Embed()
+					embed.colour = discord.Colour.orange()
+					embed.add_field(name = "Tie!", value = "It was a draw!")
+					select.disabled = True
+					await ctx.response.send_message(embed = embed)
+			elif computerguess.get(ctx.user.id) == "Scissors":
+				if select.values[0] == "Paper":
+					embed = discord.Embed()
+					embed.colour = discord.Colour.red()
+					embed.add_field(name = "Unlucky!", value = f"You lose! The computer chose {computerguess.get(ctx.user.id)} (-1 fruity point)")
+					requests.get(f"https://fruitypointsapi.ninjadev64.repl.co/modify_points?key={environ['fruitykey']}&id={ctx.user.id}&amount={minusamount}")
+					select.disabled = True
+					await ctx.response.send_message(embed = embed)
+				elif select.values[0] == "Rock":
+					embed = discord.Embed()
+					embed.colour = discord.Colour.green()
+					embed.add_field(name = "Yes!", value = f"You win! The computer chose {computerguess.get(ctx.user.id)}! (+2 fruity points)")
+					select.disabled = True
+					await ctx.response.send_message(embed = embed)
+					requests.get(f"https://fruitypointsapi.ninjadev64.repl.co/modify_points?key={environ['fruitykey']}&id={ctx.user.id}&amount={addamount}")
+				else:
+					embed = discord.Embed()
+					embed.colour = discord.Colour.orange()
+					embed.add_field(name = "Tie!", value = "It was a draw!")
+					select.disabled = True
+					await ctx.response.send_message(embed = embed)
+		select.callback = callback_comp
+		
