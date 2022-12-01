@@ -54,7 +54,16 @@ class Info(commands.Cog):
 			
 		await ctx.response.send_message(embed = embed)
 
-
-
-		
-		
+	@command(description = "Sort a list into it's alphabetical order.")
+	async def sort(self, ctx, array: str):
+		a = array.split(", ")
+		length = len(a)
+		for i in range(length):
+			for j in range(length - i - 1):
+				if a[j] > a[j + 1]:
+					a[j], a[j + 1] = a[j + 1], a[j]
+		embed = discord.Embed(colour = discord.Colour.orange())
+		embed.add_field(name = "Your List", value = "Here is the sorted answer")
+		for index, i in enumerate(a, start = 1):
+			embed.add_field(name = index, value = i)
+		await ctx.response.send_message(embed = embed)
